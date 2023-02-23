@@ -1,56 +1,34 @@
 <?php
 
-class Team {
-
-    protected $name;
-    protected $members = [];
-
-    public function __construct($name, $members = []) {
-        $this->name = $name;
-        $this->members = $members;
-    }
-
-    public static function start(... $params) {
-        return new static(... $params);
-    }
-
+abstract class AchievementType {
     public function name() {
-        return $this->name;
+        $class = (new ReflectionClass($this))->getShortName();
+
+        return trim(preg_replace('/[A-Z]/', ' $0', $class));
     }
 
-    public function members() {
-        return $this->members;
+    public function icon() {
+        return strtolower(str_replace(' ', '-', $this->name())) . '.png';
     }
 
-    public function add($name) {
-        $this->members[] = $name;
-    }
+    abstract public function qualifier($user);
+}
+class FirstThousandPoints extends AchievementType {
 
-    public function cancel() {
-
-    }
-
-    public function manager() {
+    public function qualifier($user) {
 
     }
 }
 
-class Member {
-    protected $name;
+class ReachTop50 extends AchievementType {
 
-    public function __construct($name) {
-        $this->name = $name;
+    public function qualifier($user)
+    {
+        // TODO: Implement qualifier() method.
     }
 
-    public function lastViewed() {
-
-    }
 }
 
-$acme = Team::start('Acme', [
-    new Member('John Doe'),
-    new Member('Jane Doe'),
-]);
+$achievement = new ReachTop50();
 
-var_dump($acme->members());
-
+echo $achievement->qualifier('user');
