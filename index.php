@@ -1,34 +1,59 @@
 <?php
 
-interface Newsletter {
-    public function subscribe($email);
-}
+class Subscription {
 
-class CampaignMonitor implements Newsletter {
+    protected Gateway $gateway;
 
-    public function subscribe($email)
+    public function __construct(Gateway $gateway)
     {
-        die('Subscribing with Campaign Monitor');
+        $this->gateway = $gateway;
+    }
+
+    public function create() {
+
+    }
+
+    public function cancel() {
+
+        // find stripe customer
+        $customer = $this->gateway->findStripeCustomer();
+        // find stripe subscription by customer
+    }
+
+    public function invoice() {
+
+    }
+
+    public function swap($newPlan) {
+
+    }
+
+}
+
+interface Gateway {
+    public function findStripeCustomer();
+    public function findStripeSubscriptionByCustomer();
+}
+
+
+class StripeGateway implements Gateway {
+    public function findStripeCustomer() {
+
+    }
+
+    public function findStripeSubscriptionByCustomer() {
+
     }
 }
 
-class Drip implements Newsletter {
+class BraintreeGateway implements Gateway {
+    public function findStripeCustomer() {
 
-    public function subscribe($email)
-    {
-        die('Subscribing with Drip');
+    }
+
+    public function findStripeSubscriptionByCustomer() {
+
     }
 }
 
-
-class NewsLetterSubscriptionsController {
-
-    public function store(Newsletter $newsletter) {
-        $email = 'joe@exampl.com';
-        $newsletter->subscribe($email);
-    }
-}
-
-$controller = new NewsLetterSubscriptionsController();
-$controller->store(new Drip());
-
+new Subscription(new StripeGateway());
