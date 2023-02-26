@@ -1,59 +1,52 @@
 <?php
 
-class Subscription {
+class TeamException extends Exception {
+    public static function fromTooManyMembers() {
+        return new static('You may not add mote than 3 team members.');
+    }
+}
 
-    protected Gateway $gateway;
+class Member {
+    public $name;
 
-    public function __construct(Gateway $gateway)
+    public function __construct($name)
     {
-        $this->gateway = $gateway;
-    }
-
-    public function create() {
-
-    }
-
-    public function cancel() {
-
-        // find stripe customer
-        $customer = $this->gateway->findStripeCustomer();
-        // find stripe subscription by customer
-    }
-
-    public function invoice() {
-
-    }
-
-    public function swap($newPlan) {
-
-    }
-
-}
-
-interface Gateway {
-    public function findStripeCustomer();
-    public function findStripeSubscriptionByCustomer();
-}
-
-
-class StripeGateway implements Gateway {
-    public function findStripeCustomer() {
-
-    }
-
-    public function findStripeSubscriptionByCustomer() {
-
+        $this->name = $name;
     }
 }
 
-class BraintreeGateway implements Gateway {
-    public function findStripeCustomer() {
+class Team {
+    protected $members = [];
 
+    public function add($member) {
+        if (count($this->members) === 3) {
+            throw TeamException::fromTooManyMembers();
+        }
+
+        $this->members[] = $member;
     }
 
-    public function findStripeSubscriptionByCustomer() {
-
+    public function members() {
+        return $this->members;
     }
 }
 
-new Subscription(new StripeGateway());
+class TeamMembersController {
+    public function store() {
+        $team = new Team();
+
+        try {
+            $team->add(new Member('Jane Doe'));
+            $team->add(new Member('John Doe'));
+            $team->add(new Member('Frank Doe'));
+            $team->add(new Member('Susan Doe'));
+
+            var_dump($team->members());
+        } catch (TeamException $e) {
+            var_dump($e);
+        }
+    }
+}
+
+(new TeamMembersController())->store();
+
